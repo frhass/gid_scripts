@@ -18,9 +18,9 @@ pm = PrintPM(System.out)
 path = "S:\\users\\aeh\\godthaab_iceberg_detection\\images\\sentinel_1"
 processed_path = path + "\\preprocessed\\"
 processing_dir = os.path.join(path, "processing")
-dem = r"S:\users\aeh\godthaab_iceberg_detection\arcticdem\Nuup_kangerlua_ArcticDEM1_WGS84.tif"
-mask_path = r"S:\users\aeh\godthaab_iceberg_detection\mask\OceanMask_250mBuffer_rep.shp"
-pros_folder = r"S:\users\aeh\godthaab_iceberg_detection\images\sentinel_1\processing"
+dem = r"S:\users\...\godthaab_iceberg_detection\arcticdem\demfile.tif"
+mask_path = r"S:\users\...\godthaab_iceberg_detection\mask\OceanMask.shp"
+pros_folder = r"S:\users\...\godthaab_iceberg_detection\images\sentinel_1\processing"
 
 ### Clearing the processing folder
 for f in os.listdir(pros_folder):
