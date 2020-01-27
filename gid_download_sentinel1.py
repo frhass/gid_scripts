@@ -11,7 +11,7 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', -1)
 
 ### Basic parameters, working folders, etc.
-working_folder = r"S:\users\aeh\godthaab_iceberg_detection"
+working_folder = r"S:\users\...\godthaab_iceberg_detection"
 platformname = "sentinel_1"
 imagedir = os.path.join(working_folder, "images", platformname, "downloaded")
 zipfile_dir = os.path.join(imagedir, "zip")
