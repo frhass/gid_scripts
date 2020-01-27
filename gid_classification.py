@@ -15,12 +15,12 @@ System = jpy.get_type('java.lang.System')
 pm = PrintPM(System.out)
 
 ### Working folders
-preprocessed = r"S:\users\aeh\godthaab_iceberg_detection\images\sentinel_1\preprocessed"
-processed = r"S:\users\aeh\godthaab_iceberg_detection\images\sentinel_1\processed"
-outputdir = "S:\\users\\aeh\\godthaab_iceberg_detection\\images\\sentinel_1\\classification\\"
-mask_path = r"S:\users\aeh\godthaab_iceberg_detection\mask\OceanMask_250mBuffer.shp"
-p_folder = r"\\fil01\Geodata\godthaab_iceberg_detection"
-pros_folder = r"S:\users\aeh\godthaab_iceberg_detection\images\sentinel_1\processing"
+preprocessed = r"S:\users\...\godthaab_iceberg_detection\images\sentinel_1\preprocessed"
+processed = r"S:\users\...\godthaab_iceberg_detection\images\sentinel_1\processed"
+outputdir = "S:\\users\\...\\godthaab_iceberg_detection\\images\\sentinel_1\\classification\\"
+mask_path = r"S:\users\...\godthaab_iceberg_detection\mask\OceanMask.shp"
+p_folder = r"\\...\Geodata\godthaab_iceberg_detection"
+pros_folder = r"S:\users\...\godthaab_iceberg_detection\images\sentinel_1\processing"
 
 GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
 HashMap = snappy.jpy.get_type('java.util.HashMap')
