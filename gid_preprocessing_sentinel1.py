@@ -15,7 +15,7 @@ System = jpy.get_type('java.lang.System')
 pm = PrintPM(System.out)
 
 ### Basic parameters and working folders
-path = "S:\\users\\aeh\\godthaab_iceberg_detection\\images\\sentinel_1"
+path = "S:\\users\\...\\godthaab_iceberg_detection\\images\\sentinel_1"
 processed_path = path + "\\preprocessed\\"
 processing_dir = os.path.join(path, "processing")
 dem = r"S:\users\...\godthaab_iceberg_detection\arcticdem\demfile.tif"
