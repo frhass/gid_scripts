@@ -3,6 +3,8 @@ from snappy import ProductIO
 import os, gc
 from snappy import GPF
 from snappy import jpy
+import ogr
+import gdal
 
 
 ### Loading progress monitor
@@ -93,3 +95,63 @@ def prepros(scene_folder):
         ProductIO.writeProduct(target_4, out_file, 'GeoTIFF-BigTIFF', pm)
         del target_3
         del parameters
+        
+    
+def classify(prepros_folder):
+    for file in os.listdir(prepros_folder):
+
+        ### Folder, date & timestamp
+        classification = rootpath + "\\classification"
+        scene_name = str(prepros_folder.split("\\")[X])[:32]  # [X] element of filepath, change this to match scene name. [:32] first caracters of element
+        print("scene_name:", scene_name)
+        output_folder = os.path.join(classification, scene_name)
+        print("output_folder:", output_folder)
+        polarization = str(file)[46:48] # polarization from filename
+
+        if not os.path.exists(output_folder):
+            os.mkdir(output_folder)
+
+        GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
+        HashMap = snappy.jpy.get_type('java.util.HashMap')
+        gc.enable()
+
+        sentinel_1 = ProductIO.readProduct(os.path.join(prepros_folder, file))
+
+        res = [20, 50]  # parameters for CFAR
+        for r in res:
+            resolution = r
+
+            gd_window = resolution * 12.0
+            bg_window = resolution * 37.0
+
+            # AdaptiveThresholding (Constant False Alarm Rate CFAR)
+            parameters = HashMap()
+            parameters.put('targetWindowSizeInMeter', resolution)
+            parameters.put('guardWindowSizeInMeter', gd_window)
+            parameters.put('backgroundWindowSizeInMeter', bg_window)
+            parameters.put('pfa', 6.0)
+
+            target_1 = GPF.createProduct("AdaptiveThresholding", parameters, sentinel_1)
+            parameters = None
+
+            # Subset (extracting classification band)
+            parameters = HashMap()
+            parameters.put('bandNames', 'Sigma0_' + polarization + '_ship_bit_msk')
+
+            outfile = output_folder + "\\" + scene_name + "_" + polarization + "_cfar_" + str(resolution) + "m"
+            target_2 = GPF.createProduct("Subset", parameters, target_1)
+            ProductIO.writeProduct(target_2, outfile, 'GeoTIFF-BigTIFF', pm)
+
+            # Classification to vector
+            ds = gdal.Open(str(outfile + ".tif"))
+
+            rasterband = ds.GetRasterBand(1)
+
+            dst_layername = outfile + "_Iceberg_outline"
+            drv = ogr.GetDriverByName("GeoJSON")
+            dst_ds = drv.CreateDataSource(dst_layername + ".geojson")
+            dest_srs = ogr.osr.SpatialReference()
+            dest_srs.ImportFromEPSG(4326)
+            dst_layer = dst_ds.CreateLayer(dst_layername, dest_srs)
+
+            gdal.Polygonize(rasterband, rasterband, dst_layer, -1, [], callback=None) # (input, mask, dest_layer,,,) 
