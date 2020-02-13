@@ -5,6 +5,9 @@ from snappy import GPF
 from snappy import jpy
 import ogr
 import gdal
+import geopandas as gpd
+from shapely.geometry import Polygon, MultiPolygon
+from shapely.ops import unary_union
 
 
 ### Loading progress monitor
