@@ -155,3 +155,51 @@ def classify(prepros_folder):
             dst_layer = dst_ds.CreateLayer(dst_layername, dest_srs)
 
             gdal.Polygonize(rasterband, rasterband, dst_layer, -1, [], callback=None) # (input, mask, dest_layer,,,) 
+            
+######################################################################################################################
+
+def merge(classification_folder):
+    scene_name = str(classification_folder.split("/")[6])[:32]
+    output_file = os.path.join(classification_folder, scene_name + "_merge.shp")
+
+    df = gpd.GeoDataFrame()
+
+    fileList = os.listdir(classification_folder)
+
+    # Merging geojson files
+    for file in fileList:
+        if file.endswith('.geojson'):
+            print("file:", file)
+            file = classification_folder + "/" + file
+
+            jsondf = gpd.GeoDataFrame.from_file(file)
+
+            for idx, row in jsondf.iterrows():
+                df = df.append(row, ignore_index=True)
+
+    # Union all rows into single multipolygon
+    print("Merging features...")
+    union_df = gpd.GeoSeries(unary_union(df['geometry']))
+
+    # Explode multipolygon into seperate features
+    print("Exploding polygons")
+    indf = gpd.GeoDataFrame(geometry=gpd.GeoSeries(union_df))
+    explode_df = gpd.GeoDataFrame(columns=indf.columns)
+
+    for idx, row in indf.iterrows():
+        if type(row.geometry) == Polygon:
+            explode_df = explode_df.append(row, ignore_index=True)
+        if type(row.geometry) == MultiPolygon:
+            multdf = gpd.GeoDataFrame(columns=indf.columns)
+            recs = len(row.geometry)
+            multdf = multdf.append([row] * recs, ignore_index=True)
+            for geom in range(recs):
+                multdf.loc[geom, 'geometry'] = row.geometry[geom]
+            explode_df = explode_df.append(multdf, ignore_index=True)
+
+    print(explode_df.info)
+
+    explode_df.crs = {'init': 'epsg:4326'}
+    explode_df.to_file(output_file)
+
+    print("Done")
