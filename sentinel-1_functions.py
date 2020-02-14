@@ -202,6 +202,11 @@ def merge(classification_folder):
 
     print(explode_df.info)
 
+    # Insert date column
+    explode_df.insert(1, 'date', date)
+    print("New stuff", explode_df)
+
+    # Write dataframe to shapefile
     explode_df.crs = {'init': 'epsg:4326'}
     explode_df.to_file(output_file)
 
